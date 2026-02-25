@@ -38,8 +38,36 @@
       </div>
 
       <div class="task-meta">
-        <span class="interval-badge">🔁 {{ intervalLabel(task) }}</span>
-        <span class="start-badge">Started {{ task.startDate }}</span>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Started</span>
+            <span class="meta-jdn">{{ task.dateStarted }}</span>
+            <span class="meta-gregorian">{{ julianToDisplay(task.dateStarted) }}</span>
+          </div>
+          <div class="meta-item" *ngIf="task.dateCompleted !== null">
+            <span class="meta-label">Last Completed</span>
+            <span class="meta-jdn">{{ task.dateCompleted }}</span>
+            <span class="meta-gregorian">{{ julianToDisplay(task.dateCompleted) }}</span>
+          </div>
+          <div class="meta-item meta-item--empty" *ngIf="task.dateCompleted === null">
+            <span class="meta-label">Last Completed</span>
+            <span class="meta-gregorian">—</span>
+          </div>
+        </div>
+
+        <div class="meta-row meta-row--secondary">
+          <div class="meta-badge">
+            <span class="badge-icon">🔁</span>
+            <span *ngIf="task.completionInterval !== null">
+              Every {{ task.completionInterval }} day{{ task.completionInterval !== 1 ? 's' : '' }}
+            </span>
+            <span *ngIf="task.completionInterval === null" class="badge-muted">One-time</span>
+          </div>
+          <div class="meta-badge">
+            <span class="badge-icon">✅</span>
+            {{ task.timesCompleted }} time{{ task.timesCompleted !== 1 ? 's' : '' }} completed
+          </div>
+        </div>
       </div>
 
       <div class="task-actions">

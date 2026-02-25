@@ -1,98 +1,43 @@
-import { Injectable, signal, computed } from '@angular/core';
-import { Task, IntervalUnit } from './task.model';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Task } from './task.model';
+import { todayJulian } from './julian-date.util';
 
 @Injectable({ providedIn: 'root' })
 export class TaskService {
-  private nextId = signal(1);
+  private readonly apiUrl = 'http://localhost:5245/tasks';
+
+  private http = inject(HttpClient);
   private _tasks = signal<Task[]>([]);
 
-  readonly tasks = computed(() => this._tasks().map(t => this.resetIfDue(t)));
+  readonly tasks = computed(() => this._tasks());
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
-
-  todayStr(): string {
-    return new Date().toISOString().split('T')[0];
+  loadTasks(): void {
+    this.http.get<Task[]>(this.apiUrl).subscribe(tasks => {
+      this._tasks.set(tasks);
+    });
   }
-
-  private parseDate(str: string): Date {
-    // Parse as local date (avoid UTC offset shifting the day)
-    const [y, m, d] = str.split('-').map(Number);
-    return new Date(y, m - 1, d);
-  }
-
-  /**
-   * Returns which cycle index (0-based) a given date falls into,
-   * relative to the task's startDate and interval.
-   *
-   * Examples (weekly, start = Mon Feb 23):
-   *   Feb 23 → cycle 0   (days 0–6)
-   *   Feb 25 → cycle 0
-   *   Mar 2  → cycle 1   (days 7–13)
-   */
-  private cycleIndex(date: Date, startDate: Date, intervalDays: number): number {
-    const msPerDay = 1000 * 60 * 60 * 24;
-    const dayOffset = Math.floor((date.getTime() - startDate.getTime()) / msPerDay);
-    if (dayOffset < 0) return -1; // before the habit started
-    return Math.floor(dayOffset / intervalDays);
-  }
-
-  /**
-   * Convert intervalValue + intervalUnit into a number of days.
-   * Months use 30-day approximation.
-   */
-  private intervalInDays(value: number, unit: IntervalUnit): number {
-    switch (unit) {
-      case 'days':   return value;
-      case 'weeks':  return value * 7;
-      case 'months': return value * 30;
-    }
-  }
-
-  /**
-   * If the task is completed but the completion was in a past cycle,
-   * return it with completed reset to false and completedDate cleared.
-   * Otherwise return the task unchanged.
-   */
-  private resetIfDue(task: Task): Task {
-    if (!task.completed || !task.completedDate) return task;
-
-    const start     = this.parseDate(task.startDate);
-    const today     = this.parseDate(this.todayStr());
-    const completed = this.parseDate(task.completedDate);
-
-    const intervalDays   = this.intervalInDays(task.intervalValue, task.intervalUnit);
-    const currentCycle   = this.cycleIndex(today,     start, intervalDays);
-    const completedCycle = this.cycleIndex(completed, start, intervalDays);
-
-    if (completedCycle < currentCycle) {
-      return { ...task, completed: false, completedDate: null };
-    }
-
-    return task;
-  }
-
-  // ── Public API ──────────────────────────────────────────────────────────────
 
   addTask(
     title: string,
     description: string,
     completed: boolean,
-    intervalValue: number,
-    intervalUnit: IntervalUnit,
-    startDate: string
+    dateStarted: number,
+    completionInterval: number | null
   ): void {
-    const task: Task = {
-      id: this.nextId(),
+    const body = {
       title,
       description,
       completed,
-      completedDate: completed ? this.todayStr() : null,
-      intervalValue,
-      intervalUnit,
-      startDate,
+      dateStarted,
+      dateCompleted: completed ? todayJulian() : null,
+      timesCompleted: completed ? 1 : 0,
+      completionInterval,
     };
-    this._tasks.update(tasks => [...tasks, task]);
-    this.nextId.update(id => id + 1);
+
+    this.http.post<Task>(this.apiUrl, body).subscribe(created => {
+      this._tasks.update(tasks => [...tasks, created]);
+    });
   }
 
   updateTask(
@@ -100,23 +45,57 @@ export class TaskService {
     title: string,
     description: string,
     completed: boolean,
-    intervalValue: number,
-    intervalUnit: IntervalUnit,
-    startDate: string
+    dateStarted: number,
+    dateCompleted: number | null,
+    completionInterval: number | null
   ): void {
-    this._tasks.update(tasks =>
-      tasks.map(t => {
-        if (t.id !== id) return t;
-        // Stamp completedDate only when newly completing; preserve if already done; clear if unchecking
-        const completedDate = completed
-          ? (t.completed ? t.completedDate : this.todayStr())
-          : null;
-        return { ...t, title, description, completed, completedDate, intervalValue, intervalUnit, startDate };
-      })
-    );
+    const existing = this._tasks().find(t => t.id === id);
+    if (!existing) return;
+
+    const today = todayJulian();
+    const wasCompleted = existing.completed;
+    const completedToday = existing.dateCompleted === today;
+
+    let newTimesCompleted = existing.timesCompleted;
+    let newDateCompleted = dateCompleted ?? existing.dateCompleted;
+
+    if (!wasCompleted && completed) {
+      // Checking the box:
+      // Only increment if they haven't already completed it today
+      if (!completedToday) {
+        newTimesCompleted += 1;
+        newDateCompleted = today;
+      }
+      // If completedToday is true, they unchecked and rechecked same day —
+      // leave counter and date as-is
+    } else if (wasCompleted && !completed) {
+      // Unchecking the box:
+      // If they completed it today, undo it — decrement and clear the date
+      if (completedToday) {
+        newTimesCompleted = Math.max(0, newTimesCompleted - 1);
+        newDateCompleted = null;
+      }
+      // If completed on a previous day, just uncheck without touching the counter
+    }
+
+    const body = {
+      title,
+      description,
+      completed,
+      dateStarted,
+      dateCompleted: newDateCompleted,
+      timesCompleted: newTimesCompleted,
+      completionInterval,
+    };
+
+    this.http.put<Task>(`${this.apiUrl}/${id}`, body).subscribe(updated => {
+      this._tasks.update(tasks => tasks.map(t => (t.id === id ? updated : t)));
+    });
   }
 
   deleteTask(id: number): void {
-    this._tasks.update(tasks => tasks.filter(t => t.id !== id));
+    this.http.delete(`${this.apiUrl}/${id}`).subscribe(() => {
+      this._tasks.update(tasks => tasks.filter(t => t.id !== id));
+    });
   }
 }

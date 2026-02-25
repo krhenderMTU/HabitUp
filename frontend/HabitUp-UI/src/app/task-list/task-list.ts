@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TaskService } from '../task.service';
 import { TaskFormComponent } from '../task-form/task-form';
-import { Task, IntervalUnit } from '../task.model';
+import { Task } from '../task.model';
+import { julianToDisplay } from '../julian-date.util';
 
 @Component({
   selector: 'app-task-list',
@@ -11,13 +12,19 @@ import { Task, IntervalUnit } from '../task.model';
   templateUrl: './task-list.html',
   styleUrl: './task-list.css'
 })
-export class TaskListComponent {
+export class TaskListComponent implements OnInit {
   private taskService = inject(TaskService);
 
   readonly tasks = this.taskService.tasks;
 
   showForm = false;
   editingTask: Task | null = null;
+
+  julianToDisplay = julianToDisplay;
+
+  ngOnInit(): void {
+    this.taskService.loadTasks();
+  }
 
   get completedCount(): number {
     return this.tasks().filter(t => t.completed).length;
@@ -37,9 +44,9 @@ export class TaskListComponent {
     title: string;
     description: string;
     completed: boolean;
-    intervalValue: number;
-    intervalUnit: IntervalUnit;
-    startDate: string;
+    dateStarted: number;
+    dateCompleted: number | null;
+    completionInterval: number | null;
   }): void {
     if (this.editingTask) {
       this.taskService.updateTask(
@@ -47,18 +54,17 @@ export class TaskListComponent {
         data.title,
         data.description,
         data.completed,
-        data.intervalValue,
-        data.intervalUnit,
-        data.startDate
+        data.dateStarted,
+        data.dateCompleted,
+        data.completionInterval
       );
     } else {
       this.taskService.addTask(
         data.title,
         data.description,
         data.completed,
-        data.intervalValue,
-        data.intervalUnit,
-        data.startDate
+        data.dateStarted,
+        data.completionInterval
       );
     }
     this.closeForm();
@@ -71,12 +77,5 @@ export class TaskListComponent {
 
   deleteTask(id: number): void {
     this.taskService.deleteTask(id);
-  }
-
-  intervalLabel(task: Task): string {
-    const unit = task.intervalValue === 1
-      ? task.intervalUnit.replace(/s$/, '') // "days" → "day"
-      : task.intervalUnit;
-    return `Every ${task.intervalValue} ${unit}`;
   }
 }

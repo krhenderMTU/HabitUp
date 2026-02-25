@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\keega\\Downloads\\CS 3141\\Final_Project\\HabitUp\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{C76A2306-16D2-48A1-80D0-4CB729A4141B}|backend\\HabitUp.API\\HabitUp.API.csproj|c:\\users\\keega\\downloads\\cs 3141\\final_project\\habitup\\backend\\habitup.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C76A2306-16D2-48A1-80D0-4CB729A4141B}|backend\\HabitUp.API\\HabitUp.API.csproj|solutionrelative:backend\\habitup.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\keega\\Downloads\\CS 3141\\Final_Project\\HabitUp\\backend\\HabitUp.API\\Program.cs",
+              "RelativeDocumentMoniker": "backend\\HabitUp.API\\Program.cs",
+              "ToolTip": "C:\\Users\\keega\\Downloads\\CS 3141\\Final_Project\\HabitUp\\backend\\HabitUp.API\\Program.cs",
+              "RelativeToolTip": "backend\\HabitUp.API\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-25T17:59:58.778Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

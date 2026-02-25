@@ -25,51 +25,61 @@
         id="description"
         [(ngModel)]="description"
         placeholder="Add some details..."
-        class="input textarea"
+        class="input"
         rows="3"
       ></textarea>
     </div>
 
-    <div class="field">
-      <label>Repeat Every <span class="required">*</span></label>
-      <div class="interval-row">
+    <div class="field-row">
+      <div class="field">
+        <label for="dateStarted">Date Started</label>
         <input
-          type="number"
-          [(ngModel)]="intervalValue"
-          class="input interval-num"
-          min="1"
-          max="365"
+          id="dateStarted"
+          type="date"
+          [(ngModel)]="dateStartedISO"
+          class="input"
         />
-        <select [(ngModel)]="intervalUnit" class="input interval-select">
-          <option *ngFor="let u of intervalUnits" [value]="u.value">{{ u.label }}</option>
-        </select>
       </div>
-      <p class="field-hint">How often this habit should reset.</p>
+
+      <div class="field">
+        <label for="dateCompleted">Date Completed</label>
+        <input
+          id="dateCompleted"
+          type="date"
+          [(ngModel)]="dateCompletedISO"
+          class="input"
+        />
+      </div>
     </div>
 
     <div class="field">
-      <label for="startDate">Start Date <span class="required">*</span></label>
+      <label for="completionInterval">Completion Interval (days)</label>
+      <p class="field-hint">
+        How often this task repeats — enter the number of days between each completion
+        (e.g. 7 = weekly, 30 = monthly). Leave blank for one-time tasks.
+      </p>
       <input
-        id="startDate"
-        type="date"
-        [(ngModel)]="startDate"
+        id="completionInterval"
+        type="number"
+        [(ngModel)]="completionIntervalRaw"
+        placeholder="e.g. 7"
         class="input"
+        min="1"
       />
-      <p class="field-hint">Cycles are counted from this date.</p>
     </div>
 
     <div class="field checkbox-field">
       <label class="checkbox-label">
         <input type="checkbox" [(ngModel)]="completed" class="checkbox" />
         <span class="checkbox-custom"></span>
-        Mark as completed for current cycle
+        Mark as completed
       </label>
     </div>
   </div>
 
   <div class="modal-footer">
     <button class="btn btn-secondary" (click)="onCancel()">Cancel</button>
-    <button class="btn btn-primary" (click)="onSave()" [disabled]="!title.trim() || !startDate">
+    <button class="btn btn-primary" (click)="onSave()" [disabled]="!title.trim()">
       {{ isEditMode ? 'Save Changes' : 'Create Task' }}
     </button>
   </div>
