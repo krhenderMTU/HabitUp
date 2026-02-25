@@ -1,44 +1,118 @@
+using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddOpenApi();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+// In-memory task store (replace with a real DB later)
+var taskStore = new List<TaskRecord>();
+var nextId = 1;
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+app.UseCors("AllowAngular");
 
-var summaries = new[]
+// ── GET /tasks ───────────────────────────────────────────────────────────────
+app.MapGet("/tasks", () =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    return Results.Ok(taskStore);
+})
+.WithName("GetTasks");
 
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast")
-    .WithOpenApi();
+// ── GET /tasks/{id} ──────────────────────────────────────────────────────────
+app.MapGet("/tasks/{id}", (int id) =>
+{
+    var task = taskStore.FirstOrDefault(t => t.Id == id);
+    return task is not null ? Results.Ok(task) : Results.NotFound();
+})
+.WithName("GetTask");
+
+// ── POST /tasks ──────────────────────────────────────────────────────────────
+app.MapPost("/tasks", (CreateTaskRequest request) =>
+{
+    var task = new TaskRecord(
+        Id: nextId++,
+        Title: request.Title,
+        Description: request.Description,
+        Completed: request.Completed,
+        DateStarted: request.DateStarted,
+        DateCompleted: request.DateCompleted,
+        TimesCompleted: request.TimesCompleted,
+        CompletionInterval: request.CompletionInterval
+    );
+    taskStore.Add(task);
+    return Results.Created($"/tasks/{task.Id}", task);
+})
+.WithName("CreateTask");
+
+// ── PUT /tasks/{id} ──────────────────────────────────────────────────────────
+app.MapPut("/tasks/{id}", (int id, CreateTaskRequest request) =>
+{
+    var index = taskStore.FindIndex(t => t.Id == id);
+    if (index == -1) return Results.NotFound();
+
+    taskStore[index] = new TaskRecord(
+        Id: id,
+        Title: request.Title,
+        Description: request.Description,
+        Completed: request.Completed,
+        DateStarted: request.DateStarted,
+        DateCompleted: request.DateCompleted,
+        TimesCompleted: request.TimesCompleted,
+        CompletionInterval: request.CompletionInterval
+    );
+    return Results.Ok(taskStore[index]);
+})
+.WithName("UpdateTask");
+
+// ── DELETE /tasks/{id} ───────────────────────────────────────────────────────
+app.MapDelete("/tasks/{id}", (int id) =>
+{
+    var task = taskStore.FirstOrDefault(t => t.Id == id);
+    if (task is null) return Results.NotFound();
+
+    taskStore.Remove(task);
+    return Results.NoContent();
+})
+.WithName("DeleteTask");
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+// ── Models ───────────────────────────────────────────────────────────────────
+
+record TaskRecord(
+    int Id,
+    string Title,
+    string Description,
+    bool Completed,
+    int DateStarted,
+    int? DateCompleted,
+    int TimesCompleted,
+    int? CompletionInterval
+);
+
+record CreateTaskRequest(
+    string Title,
+    string Description,
+    bool Completed,
+    int DateStarted,
+    int? DateCompleted,
+    int TimesCompleted,
+    int? CompletionInterval
+);
