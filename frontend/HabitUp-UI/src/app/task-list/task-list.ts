@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TaskService } from '../task.service';
 import { TaskFormComponent } from '../task-form/task-form';
-import { Task } from '../task.model';
+import { Task, IntervalUnit } from '../task.model';
 
 @Component({
   selector: 'app-task-list',
@@ -33,11 +33,33 @@ export class TaskListComponent {
     this.showForm = true;
   }
 
-  onSave(data: { title: string; description: string; completed: boolean }): void {
+  onSave(data: {
+    title: string;
+    description: string;
+    completed: boolean;
+    intervalValue: number;
+    intervalUnit: IntervalUnit;
+    startDate: string;
+  }): void {
     if (this.editingTask) {
-      this.taskService.updateTask(this.editingTask.id, data.title, data.description, data.completed);
+      this.taskService.updateTask(
+        this.editingTask.id,
+        data.title,
+        data.description,
+        data.completed,
+        data.intervalValue,
+        data.intervalUnit,
+        data.startDate
+      );
     } else {
-      this.taskService.addTask(data.title, data.description, data.completed);
+      this.taskService.addTask(
+        data.title,
+        data.description,
+        data.completed,
+        data.intervalValue,
+        data.intervalUnit,
+        data.startDate
+      );
     }
     this.closeForm();
   }
@@ -49,5 +71,12 @@ export class TaskListComponent {
 
   deleteTask(id: number): void {
     this.taskService.deleteTask(id);
+  }
+
+  intervalLabel(task: Task): string {
+    const unit = task.intervalValue === 1
+      ? task.intervalUnit.replace(/s$/, '') // "days" → "day"
+      : task.intervalUnit;
+    return `Every ${task.intervalValue} ${unit}`;
   }
 }

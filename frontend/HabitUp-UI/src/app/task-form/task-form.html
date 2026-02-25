@@ -26,22 +26,50 @@
         [(ngModel)]="description"
         placeholder="Add some details..."
         class="input textarea"
-        rows="4"
+        rows="3"
       ></textarea>
+    </div>
+
+    <div class="field">
+      <label>Repeat Every <span class="required">*</span></label>
+      <div class="interval-row">
+        <input
+          type="number"
+          [(ngModel)]="intervalValue"
+          class="input interval-num"
+          min="1"
+          max="365"
+        />
+        <select [(ngModel)]="intervalUnit" class="input interval-select">
+          <option *ngFor="let u of intervalUnits" [value]="u.value">{{ u.label }}</option>
+        </select>
+      </div>
+      <p class="field-hint">How often this habit should reset.</p>
+    </div>
+
+    <div class="field">
+      <label for="startDate">Start Date <span class="required">*</span></label>
+      <input
+        id="startDate"
+        type="date"
+        [(ngModel)]="startDate"
+        class="input"
+      />
+      <p class="field-hint">Cycles are counted from this date.</p>
     </div>
 
     <div class="field checkbox-field">
       <label class="checkbox-label">
         <input type="checkbox" [(ngModel)]="completed" class="checkbox" />
         <span class="checkbox-custom"></span>
-        Mark as completed
+        Mark as completed for current cycle
       </label>
     </div>
   </div>
 
   <div class="modal-footer">
     <button class="btn btn-secondary" (click)="onCancel()">Cancel</button>
-    <button class="btn btn-primary" (click)="onSave()" [disabled]="!title.trim()">
+    <button class="btn btn-primary" (click)="onSave()" [disabled]="!title.trim() || !startDate">
       {{ isEditMode ? 'Save Changes' : 'Create Task' }}
     </button>
   </div>

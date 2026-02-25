@@ -199,3 +199,32 @@ label {
   from { opacity: 0; transform: translate(-50%, -46%); }
   to { opacity: 1; transform: translate(-50%, -50%); }
 }
+
+/* ── Interval row ── */
+.interval-row {
+  display: flex;
+  gap: 10px;
+}
+
+.interval-num {
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.interval-select {
+  flex: 1;
+  appearance: none;
+  cursor: pointer;
+}
+
+.field-hint {
+  font-size: 0.75rem;
+  color: #444466;
+  margin: 4px 0 0;
+}
+
+/* Date input */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+  cursor: pointer;
+}

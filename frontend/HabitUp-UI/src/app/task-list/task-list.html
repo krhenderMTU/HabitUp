@@ -36,6 +36,12 @@
           <p class="task-description task-description--empty" *ngIf="!task.description">No description</p>
         </div>
       </div>
+
+      <div class="task-meta">
+        <span class="interval-badge">🔁 {{ intervalLabel(task) }}</span>
+        <span class="start-badge">Started {{ task.startDate }}</span>
+      </div>
+
       <div class="task-actions">
         <button class="action-btn edit-btn" (click)="openEditForm(task)">Edit</button>
         <button class="action-btn delete-btn" (click)="deleteTask(task.id)">Delete</button>
