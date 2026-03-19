@@ -8,48 +8,48 @@
 
   <div class="modal-body">
     <div class="field">
-      <label for="title">Title <span class="required">*</span></label>
+      <div class="label-row">
+        <label for="title">Title <span class="required">*</span></label>
+        <span class="char-count" [class.char-count--warn]="title.length >= 40" [class.char-count--max]="title.length >= 50">
+          {{ title.length }}/50
+        </span>
+      </div>
       <input
         id="title"
         type="text"
         [(ngModel)]="title"
         placeholder="What needs to be done?"
         class="input"
+        maxlength="50"
         autofocus
       />
     </div>
 
     <div class="field">
-      <label for="description">Description</label>
+      <div class="label-row">
+        <label for="description">Description</label>
+        <span class="char-count" [class.char-count--warn]="description.length >= 160" [class.char-count--max]="description.length >= 200">
+          {{ description.length }}/200
+        </span>
+      </div>
       <textarea
         id="description"
         [(ngModel)]="description"
         placeholder="Add some details..."
         class="input"
         rows="3"
+        maxlength="200"
       ></textarea>
     </div>
 
-    <div class="field-row">
-      <div class="field">
-        <label for="dateStarted">Date Started</label>
-        <input
-          id="dateStarted"
-          type="date"
-          [(ngModel)]="dateStartedISO"
-          class="input"
-        />
-      </div>
-
-      <div class="field">
-        <label for="dateCompleted">Date Completed</label>
-        <input
-          id="dateCompleted"
-          type="date"
-          [(ngModel)]="dateCompletedISO"
-          class="input"
-        />
-      </div>
+    <div class="field">
+      <label for="dateStarted">Date to Start</label>
+      <input
+        id="dateStarted"
+        type="date"
+        [(ngModel)]="dateStartedISO"
+        class="input"
+      />
     </div>
 
     <div class="field">
@@ -79,7 +79,7 @@
 
   <div class="modal-footer">
     <button class="btn btn-secondary" (click)="onCancel()">Cancel</button>
-    <button class="btn btn-primary" (click)="onSave()" [disabled]="!title.trim()">
+    <button class="btn btn-primary" (click)="onSave()" [disabled]="!isValid">
       {{ isEditMode ? 'Save Changes' : 'Create Task' }}
     </button>
   </div>

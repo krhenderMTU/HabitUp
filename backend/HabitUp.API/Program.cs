@@ -1,5 +1,3 @@
-using System.Text;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
@@ -15,7 +13,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-// In-memory task store (replace with a real DB later)
 var taskStore = new List<TaskRecord>();
 var nextId = 1;
 
@@ -46,6 +43,11 @@ app.MapGet("/tasks/{id}", (int id) =>
 // ── POST /tasks ──────────────────────────────────────────────────────────────
 app.MapPost("/tasks", (CreateTaskRequest request) =>
 {
+    if (request.Title.Length > 50)
+        return Results.BadRequest("Title cannot exceed 50 characters.");
+    if (request.Description.Length > 200)
+        return Results.BadRequest("Description cannot exceed 200 characters.");
+
     var task = new TaskRecord(
         Id: nextId++,
         Title: request.Title,
@@ -64,6 +66,11 @@ app.MapPost("/tasks", (CreateTaskRequest request) =>
 // ── PUT /tasks/{id} ──────────────────────────────────────────────────────────
 app.MapPut("/tasks/{id}", (int id, CreateTaskRequest request) =>
 {
+    if (request.Title.Length > 50)
+        return Results.BadRequest("Title cannot exceed 50 characters.");
+    if (request.Description.Length > 200)
+        return Results.BadRequest("Description cannot exceed 200 characters.");
+
     var index = taskStore.FindIndex(t => t.Id == id);
     if (index == -1) return Results.NotFound();
 

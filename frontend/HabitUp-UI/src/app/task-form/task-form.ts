@@ -24,11 +24,13 @@ export class TaskFormComponent implements OnInit {
   }>();
   @Output() cancel = new EventEmitter<void>();
 
+  readonly TITLE_MAX = 50;
+  readonly DESC_MAX = 200;
+
   title = '';
   description = '';
   completed = false;
   dateStartedISO = toISODate(new Date());
-  dateCompletedISO = '';
   completionIntervalRaw = '';
 
   get isEditMode(): boolean {
@@ -40,28 +42,33 @@ export class TaskFormComponent implements OnInit {
     return !isNaN(parsed) && parsed > 0 ? parsed : null;
   }
 
+  get isValid(): boolean {
+    return (
+      this.title.trim().length > 0 &&
+      this.title.length <= this.TITLE_MAX &&
+      this.description.length <= this.DESC_MAX
+    );
+  }
+
   ngOnInit(): void {
     if (this.task) {
       this.title = this.task.title;
       this.description = this.task.description;
       this.completed = this.task.completed;
       this.dateStartedISO = toISODate(fromJulian(this.task.dateStarted));
-      this.dateCompletedISO = this.task.dateCompleted
-        ? toISODate(fromJulian(this.task.dateCompleted))
-        : '';
       this.completionIntervalRaw =
         this.task.completionInterval !== null ? String(this.task.completionInterval) : '';
     }
   }
 
   onSave(): void {
-    if (!this.title.trim()) return;
+    if (!this.isValid) return;
     this.save.emit({
       title: this.title.trim(),
       description: this.description.trim(),
       completed: this.completed,
       dateStarted: toJulian(this.dateStartedISO),
-      dateCompleted: this.dateCompletedISO ? toJulian(this.dateCompletedISO) : null,
+      dateCompleted: null, // managed automatically by TaskService, not user input
       completionInterval: this.completionInterval,
     });
   }

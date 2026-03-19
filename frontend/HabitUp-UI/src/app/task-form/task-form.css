@@ -73,6 +73,13 @@
   gap: 16px;
 }
 
+/* Label + character counter on the same row */
+.label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 label {
   font-size: 0.8rem;
   font-weight: 600;
@@ -82,6 +89,22 @@ label {
 }
 
 .required {
+  color: #ff6b6b;
+}
+
+/* Character counter */
+.char-count {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #444466;
+  transition: color 0.2s;
+}
+
+.char-count--warn {
+  color: #e8c547;
+}
+
+.char-count--max {
   color: #ff6b6b;
 }
 
