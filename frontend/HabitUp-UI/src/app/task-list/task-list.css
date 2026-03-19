@@ -64,25 +64,7 @@
   box-shadow: 0 8px 24px rgba(232, 197, 71, 0.3);
 }
 
-.plus {
-  font-size: 1.2rem;
-  line-height: 1;
-}
-
-/* ── Stats Bar ── */
-.stats-bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 16px 48px;
-  font-size: 0.85rem;
-  color: #555577;
-}
-
-.stat { font-weight: 500; }
-.completed-stat { color: #4ecb71; }
-.pending-stat { color: #e8c547; }
-.divider { color: #2a2a4a; }
+.plus { font-size: 1.2rem; line-height: 1; }
 
 /* ── Task Grid ── */
 .task-grid {
@@ -100,7 +82,7 @@
   padding: 22px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 
@@ -141,12 +123,13 @@
 
 .task-content { flex: 1; min-width: 0; }
 
+/* Title — bumped up to match meta-value range */
 .task-title {
   font-family: 'Syne', sans-serif;
   font-size: 1rem;
   font-weight: 700;
   margin: 0 0 6px;
-  color: #f0f0ff;
+  color: #d8d8f0;
   word-break: break-word;
 }
 
@@ -155,71 +138,47 @@
   color: #555577;
 }
 
+/* Description — lifted from #7777aa to a lighter tone */
 .task-description {
   font-size: 0.875rem;
-  color: #7777aa;
+  color: #b0b0cc;
   margin: 0;
   line-height: 1.5;
   word-break: break-word;
 }
 
-.task-description--empty {
-  font-style: italic;
-  color: #333355;
-}
+.task-description--empty { font-style: italic; color: #555566; }
 
 /* ── Task Meta ── */
 .task-meta {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 14px 0;
+  gap: 8px;
+  padding: 12px 0;
   border-top: 1px solid #1a1a30;
   border-bottom: 1px solid #1a1a30;
 }
 
-.meta-row {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-}
+.meta-row { display: flex; gap: 16px; flex-wrap: wrap; }
 
-.meta-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-  min-width: 100px;
-}
-
-.meta-item--empty .meta-gregorian { color: #333355; }
+.meta-item { display: flex; flex-direction: column; gap: 3px; }
 
 .meta-label {
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #444466;
+  color: #7777aa;
 }
 
-.meta-jdn {
-  font-size: 1rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: #e8c547;
-  letter-spacing: 0.02em;
+/* Date value — unchanged, this is the reference color */
+.meta-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #c0c0dd;
 }
 
-.meta-gregorian {
-  font-size: 0.75rem;
-  color: #555577;
-}
-
-.meta-row--secondary {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+.meta-row--secondary { display: flex; gap: 8px; flex-wrap: wrap; }
 
 .meta-badge {
   display: flex;
@@ -230,12 +189,12 @@
   border-radius: 8px;
   padding: 5px 10px;
   font-size: 0.78rem;
-  color: #9999cc;
+  color: #b0b0cc;
   font-weight: 500;
 }
 
 .badge-icon { font-size: 0.75rem; }
-.badge-muted { color: #444466; }
+.badge-muted { color: #666688; }
 
 /* ── Task Actions ── */
 .task-actions { display: flex; gap: 10px; }
@@ -252,11 +211,139 @@
   transition: all 0.2s;
 }
 
-.edit-btn { background: #1e1e3a; color: #9999cc; }
+.edit-btn { background: #1e1e3a; color: #b0b0cc; }
 .edit-btn:hover { background: #2a2a4a; color: #f0f0ff; }
 
-.delete-btn { background: rgba(255, 80, 80, 0.1); color: #ff6666; }
-.delete-btn:hover { background: rgba(255, 80, 80, 0.2); color: #ff8888; }
+.delete-btn { background: rgba(255, 80, 80, 0.1); color: #ff8888; }
+.delete-btn:hover { background: rgba(255, 80, 80, 0.2); color: #ffaaaa; }
+
+/* ── View Stats Button ── */
+.stats-toggle-btn {
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: 1px dashed #2a2a4a;
+  border-radius: 8px;
+  color: #9090bb;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 0.2s;
+}
+
+.stats-toggle-btn:hover {
+  border-color: #e8c547;
+  color: #e8c547;
+  background: rgba(232, 197, 71, 0.04);
+}
+
+/* ── Stats Panel ── */
+.stats-panel {
+  background: #0f0f1e;
+  border: 1px solid #1e1e3a;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeIn 0.15s ease;
+}
+
+.stats-row { display: flex; gap: 20px; }
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7777aa;
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #e8c547;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Stats formula note — lifted to match meta-value range */
+.stats-formula-note {
+  font-size: 0.78rem;
+  color: #9090bb;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.stats-diagram-placeholder {
+  width: 100%;
+  height: 120px;
+  border: 1px dashed #2a2a4a;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholder-label {
+  font-size: 0.78rem;
+  color: #555577;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── Delete Confirmation ── */
+.delete-confirm {
+  background: rgba(255, 60, 60, 0.07);
+  border: 1px solid rgba(255, 80, 80, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeIn 0.15s ease;
+}
+
+.confirm-message {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #d8d8f0;
+  margin: 0;
+}
+
+.confirm-sub {
+  font-size: 0.8rem;
+  color: #b0b0cc;
+  margin: 0;
+}
+
+.confirm-actions { display: flex; gap: 10px; margin-top: 4px; }
+
+.confirm-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.confirm-no { background: #1e1e3a; color: #b0b0cc; }
+.confirm-no:hover { background: #2a2a4a; color: #f0f0ff; }
+
+.confirm-yes { background: rgba(255, 80, 80, 0.2); color: #ff8888; }
+.confirm-yes:hover { background: rgba(255, 80, 80, 0.35); color: #ffaaaa; }
 
 /* ── Empty State ── */
 .empty-state { text-align: center; padding: 100px 20px; }
@@ -272,10 +359,15 @@
 
 .empty-body { color: #333355; font-size: 0.95rem; margin: 0; }
 
+/* ── Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ── Responsive ── */
 @media (max-width: 600px) {
   .header { padding: 20px; }
-  .stats-bar { padding: 12px 20px; }
   .task-grid { padding: 16px 20px; gap: 14px; }
   .app-title { font-size: 1.2rem; }
   .create-btn { padding: 10px 16px; font-size: 0.875rem; }

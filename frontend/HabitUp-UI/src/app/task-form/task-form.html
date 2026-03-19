@@ -42,26 +42,14 @@
       ></textarea>
     </div>
 
-    <div class="field-row">
-      <div class="field">
-        <label for="dateStarted">Date Started</label>
-        <input
-          id="dateStarted"
-          type="date"
-          [(ngModel)]="dateStartedISO"
-          class="input"
-        />
-      </div>
-
-      <div class="field">
-        <label for="dateCompleted">Date Completed</label>
-        <input
-          id="dateCompleted"
-          type="date"
-          [(ngModel)]="dateCompletedISO"
-          class="input"
-        />
-      </div>
+    <div class="field">
+      <label for="dateStarted">Date to Start</label>
+      <input
+        id="dateStarted"
+        type="date"
+        [(ngModel)]="dateStartedISO"
+        class="input"
+      />
     </div>
 
     <div class="field">
@@ -91,7 +79,7 @@
 
   <div class="modal-footer">
     <button class="btn btn-secondary" (click)="onCancel()">Cancel</button>
-    <button class="btn btn-primary" (click)="onSave()" [disabled]="!title.trim() || title.length > 50 || description.length > 200">
+    <button class="btn btn-primary" (click)="onSave()" [disabled]="!isValid">
       {{ isEditMode ? 'Save Changes' : 'Create Task' }}
     </button>
   </div>

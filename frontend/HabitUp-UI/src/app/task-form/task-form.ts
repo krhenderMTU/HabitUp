@@ -31,7 +31,6 @@ export class TaskFormComponent implements OnInit {
   description = '';
   completed = false;
   dateStartedISO = toISODate(new Date());
-  dateCompletedISO = '';
   completionIntervalRaw = '';
 
   get isEditMode(): boolean {
@@ -57,9 +56,6 @@ export class TaskFormComponent implements OnInit {
       this.description = this.task.description;
       this.completed = this.task.completed;
       this.dateStartedISO = toISODate(fromJulian(this.task.dateStarted));
-      this.dateCompletedISO = this.task.dateCompleted
-        ? toISODate(fromJulian(this.task.dateCompleted))
-        : '';
       this.completionIntervalRaw =
         this.task.completionInterval !== null ? String(this.task.completionInterval) : '';
     }
@@ -72,7 +68,7 @@ export class TaskFormComponent implements OnInit {
       description: this.description.trim(),
       completed: this.completed,
       dateStarted: toJulian(this.dateStartedISO),
-      dateCompleted: this.dateCompletedISO ? toJulian(this.dateCompletedISO) : null,
+      dateCompleted: null, // managed automatically by TaskService, not user input
       completionInterval: this.completionInterval,
     });
   }

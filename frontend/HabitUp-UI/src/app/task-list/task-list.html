@@ -12,20 +12,13 @@
     </button>
   </header>
 
-  <div class="stats-bar" *ngIf="tasks().length > 0">
-    <span class="stat">{{ tasks().length }} task{{ tasks().length !== 1 ? 's' : '' }}</span>
-    <span class="divider">·</span>
-    <span class="stat completed-stat">{{ completedCount }} completed</span>
-    <span class="divider">·</span>
-    <span class="stat pending-stat">{{ tasks().length - completedCount }} pending</span>
-  </div>
-
   <main class="task-grid" *ngIf="tasks().length > 0; else empty">
     <div
       class="task-card"
       [class.task-card--done]="task.completed"
       *ngFor="let task of tasks()"
     >
+      <!-- Title & status -->
       <div class="task-card-top">
         <div class="task-status" [class.task-status--done]="task.completed">
           <span *ngIf="task.completed">✓</span>
@@ -37,24 +30,14 @@
         </div>
       </div>
 
+      <!-- Date & interval metadata -->
       <div class="task-meta">
         <div class="meta-row">
           <div class="meta-item">
-            <span class="meta-label">Started</span>
-            <span class="meta-jdn">{{ task.dateStarted }}</span>
-            <span class="meta-gregorian">{{ julianToDisplay(task.dateStarted) }}</span>
-          </div>
-          <div class="meta-item" *ngIf="task.dateCompleted !== null">
-            <span class="meta-label">Last Completed</span>
-            <span class="meta-jdn">{{ task.dateCompleted }}</span>
-            <span class="meta-gregorian">{{ julianToDisplay(task.dateCompleted) }}</span>
-          </div>
-          <div class="meta-item meta-item--empty" *ngIf="task.dateCompleted === null">
-            <span class="meta-label">Last Completed</span>
-            <span class="meta-gregorian">—</span>
+            <span class="meta-label">Date to Start</span>
+            <span class="meta-value">{{ julianToDisplay(task.dateStarted) }}</span>
           </div>
         </div>
-
         <div class="meta-row meta-row--secondary">
           <div class="meta-badge">
             <span class="badge-icon">🔁</span>
@@ -63,17 +46,55 @@
             </span>
             <span *ngIf="task.completionInterval === null" class="badge-muted">One-time</span>
           </div>
-          <div class="meta-badge">
-            <span class="badge-icon">✅</span>
-            {{ task.timesCompleted }} time{{ task.timesCompleted !== 1 ? 's' : '' }} completed
-          </div>
         </div>
       </div>
 
+      <!-- Action buttons -->
       <div class="task-actions">
         <button class="action-btn edit-btn" (click)="openEditForm(task)">Edit</button>
-        <button class="action-btn delete-btn" (click)="deleteTask(task.id)">Delete</button>
+        <button class="action-btn delete-btn" (click)="requestDelete(task.id)">Delete</button>
       </div>
+
+      <!-- View Stats toggle -->
+      <button class="stats-toggle-btn" (click)="toggleStats(task.id)">
+        {{ statsOpenFor === task.id ? 'Hide Stats ▲' : 'View Stats ▼' }}
+      </button>
+
+      <!-- Stats panel -->
+      <div class="stats-panel" *ngIf="statsOpenFor === task.id">
+        <div class="stats-row">
+          <div class="stat-item">
+            <span class="stat-label">Times Completed</span>
+            <span class="stat-value">{{ task.timesCompleted }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Completion Rate</span>
+            <span class="stat-value">{{ percentComplete(task) }}%</span>
+          </div>
+        </div>
+        <div class="stats-formula-note" *ngIf="task.completionInterval !== null">
+          {{ task.timesCompleted }} completions out of {{ expectedCompletions(task) }} expected since start date.
+        </div>
+        <div class="stats-formula-note" *ngIf="task.completionInterval === null">
+          One-time task — {{ task.completed ? 'completed' : 'not yet completed' }}.
+        </div>
+
+        <!-- Space reserved for specialized diagram -->
+        <div class="stats-diagram-placeholder">
+          <span class="placeholder-label">Chart coming soon</span>
+        </div>
+      </div>
+
+      <!-- Delete confirmation -->
+      <div class="delete-confirm" *ngIf="deleteConfirmFor === task.id">
+        <p class="confirm-message">Are you sure you want to delete this task?</p>
+        <p class="confirm-sub">Press Yes to delete.</p>
+        <div class="confirm-actions">
+          <button class="confirm-btn confirm-no" (click)="cancelDelete()">Cancel</button>
+          <button class="confirm-btn confirm-yes" (click)="confirmDelete(task.id)">Yes, Delete</button>
+        </div>
+      </div>
+
     </div>
   </main>
 
