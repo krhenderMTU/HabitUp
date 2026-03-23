@@ -1,9 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TaskService } from '../task.service';
 import { TaskFormComponent } from '../task-form/task-form';
 import { Task } from '../task.model';
 import { julianToDisplay, todayJulian } from '../julian-date.util';
+import { Chart } from 'chart.js/auto'
 
 @Component({
   selector: 'app-task-list',
@@ -57,6 +58,25 @@ export class TaskListComponent implements OnInit {
     if (task.completionInterval === null) return '—';
     const days = todayJulian() - task.dateStarted;
     return Math.max(1, days / task.completionInterval).toFixed(1);
+  }
+
+  // Pie Chart for Displaying Percent Complete
+  buildPCChart(task: Task)
+  {
+    
+    const element = document.getElementById('task-chart') as HTMLCanvasElement;
+
+    const chart = new Chart(element, {
+      type: 'pie',
+      data:{
+        labels: ['Days Completed'],
+        datasets: [{
+          data: [this.percentComplete(task)],
+          backgroundColor: ['rgb(87, 25, 214)'],
+          hoverOffset: 4
+        }],
+      }
+    });
   }
 
   // ── Delete with confirmation ──────────────────────────────────────────────
