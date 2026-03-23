@@ -1,10 +1,10 @@
-import { Component, ElementRef, inject, OnInit, viewChild } from '@angular/core';
+import { Component, inject, OnInit, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TaskService } from '../task.service';
 import { TaskFormComponent } from '../task-form/task-form';
 import { Task } from '../task.model';
 import { julianToDisplay, todayJulian } from '../julian-date.util';
-import { Chart } from 'chart.js/auto'
+import { Chart } from 'chart.js/auto';
 
 @Component({
   selector: 'app-task-list',
