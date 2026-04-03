@@ -51,6 +51,14 @@ dist/
 # Environment files with secrets
 src/environments/environment.prod.ts
 
+# ── SQLite ───────────────────────────────────────────────────────────────────
+*.db
+*.db-shm
+*.db-wal
+
+# Angular build output (served via backend wwwroot)
+backend/HabitUp.API/wwwroot/
+
 # ── General ──────────────────────────────────────────────────────────────────
 # OS files
 .DS_Store

@@ -7,27 +7,69 @@
         <p class="app-subtitle">Task Manager</p>
       </div>
     </div>
+
+    <!-- Search bar -->
+    <div class="search-wrapper">
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Search tasks..."
+        [(ngModel)]="searchQuery"
+        (focus)="onSearchFocus()"
+        (blur)="onSearchBlur()"
+      />
+      <div class="search-dropdown" *ngIf="searchDropdownOpen && searchResults.length > 0">
+        <button
+          class="search-result"
+          *ngFor="let result of searchResults"
+          (mousedown)="onSearchSelect(result)"
+        >
+          <span class="result-status" [class.result-status--done]="result.completed">
+            {{ result.completed ? '✓' : '' }}
+          </span>
+          {{ result.title }}
+        </button>
+      </div>
+    </div>
+
     <button class="create-btn" (click)="openCreateForm()">
       <span class="plus">+</span> Create Task
     </button>
   </header>
 
-  <main class="task-grid" *ngIf="tasks().length > 0; else empty">
+  <main class="task-grid" *ngIf="orderedTasks.length > 0; else empty">
     <div
       class="task-card"
       [class.task-card--done]="task.completed"
-      *ngFor="let task of tasks()"
+      [class.task-card--dragging]="draggedId === task.id"
+      [class.task-card--glow]="glowingTaskId === task.id"
+      *ngFor="let task of orderedTasks"
+      draggable="true"
+      (dragstart)="onDragStart(task.id, $event)"
+      (dragover)="onDragOver($event, task.id)"
+      (dragend)="onDragEnd()"
     >
       <!-- Title & status -->
       <div class="task-card-top">
-        <div class="task-status" [class.task-status--done]="task.completed">
+
+        <!-- Status box is now a button -->
+        <button
+          class="task-status"
+          [class.task-status--done]="task.completed"
+          (click)="quickToggleComplete(task)"
+          [title]="task.completed ? 'Mark incomplete' : 'Mark complete'"
+        >
           <span *ngIf="task.completed">✓</span>
-        </div>
+        </button>
+
         <div class="task-content">
           <h3 class="task-title" [class.task-title--done]="task.completed">{{ task.title }}</h3>
           <p class="task-description" *ngIf="task.description">{{ task.description }}</p>
           <p class="task-description task-description--empty" *ngIf="!task.description">No description</p>
         </div>
+
+        <!-- Drag handle indicator -->
+        <div class="drag-handle" title="Drag to reorder">⠿</div>
       </div>
 
       <!-- Date & interval metadata -->
@@ -57,11 +99,11 @@
 
       <!-- View Stats toggle -->
       <button class="stats-toggle-btn" (click)="toggleStats(task.id)">
-        {{ statsOpenFor === task.id ? 'Hide Stats ▲' : 'View Stats ▼' }}
+        {{ isStatsOpen(task.id) ? 'Hide Stats ▲' : 'View Stats ▼' }}
       </button>
 
       <!-- Stats panel -->
-      <div class="stats-panel" *ngIf="statsOpenFor === task.id">
+      <div class="stats-panel" *ngIf="isStatsOpen(task.id)">
         <div class="stats-row">
           <div class="stat-item">
             <span class="stat-label">Times Completed</span>
@@ -78,11 +120,8 @@
         <div class="stats-formula-note" *ngIf="task.completionInterval === null">
           One-time task — {{ task.completed ? 'completed' : 'not yet completed' }}.
         </div>
-
-        <!-- Space reserved for specialized diagram -->
-        <div class="stats-diagram">
-          <canvas id = "task-chart"></canvas>
-            {{ buildPCChart(task) }}
+        <div class="stats-diagram-placeholder">
+          <span class="placeholder-label">Chart coming soon</span>
         </div>
       </div>
 

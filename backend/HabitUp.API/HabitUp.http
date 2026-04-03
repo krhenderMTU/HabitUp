@@ -1,4 +1,4 @@
-@HabitUp_HostAddress = http://localhost:5245
+@HabitUp_HostAddress = http://localhost:5151
 
 GET {{HabitUp_HostAddress}}/weatherforecast/
 Accept: application/json
