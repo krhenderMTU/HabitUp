@@ -68,7 +68,7 @@ export class TaskFormComponent implements OnInit {
       description: this.description.trim(),
       completed: this.completed,
       dateStarted: toJulian(this.dateStartedISO),
-      dateCompleted: null, // managed automatically by TaskService, not user input
+      dateCompleted: null, // managed automatically by TaskService
       completionInterval: this.completionInterval,
     });
   }

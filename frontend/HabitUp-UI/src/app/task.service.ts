@@ -5,7 +5,7 @@ import { todayJulian } from './julian-date.util';
 
 @Injectable({ providedIn: 'root' })
 export class TaskService {
-  private readonly apiUrl = 'http://localhost:5245/tasks';
+  private readonly apiUrl = '/tasks';
 
   private http = inject(HttpClient);
   private _tasks = signal<Task[]>([]);
