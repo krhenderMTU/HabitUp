@@ -1,4 +1,6 @@
 <div class="page">
+
+  <!-- ── Header ── -->
   <header class="header">
     <div class="header-left">
       <div class="logo">⚡</div>
@@ -8,7 +10,7 @@
       </div>
     </div>
 
-    <!-- Search bar -->
+    <!-- Search -->
     <div class="search-wrapper">
       <input
         class="search-input"
@@ -32,11 +34,95 @@
       </div>
     </div>
 
-    <button class="create-btn" (click)="openCreateForm()">
-      <span class="plus">+</span> Create Task
-    </button>
+    <div class="header-actions">
+      <!-- Reminder button -->
+      <div class="reminder-wrapper">
+        <button
+          class="reminder-btn"
+          [class.reminder-btn--active]="reminderActive"
+          (click)="toggleReminderForm()"
+          [title]="reminderActive ? 'Reminder set for ' + reminderTime : 'Set reminder'"
+        >
+          🔔 {{ reminderActive ? reminderTime : 'Set Reminder' }}
+        </button>
+
+        <div class="reminder-form" *ngIf="showReminderForm">
+          <p class="reminder-form-label">Remind me at:</p>
+          <input
+            type="time"
+            class="reminder-time-input"
+            [(ngModel)]="reminderTime"
+          />
+          <p class="reminder-form-hint">
+            A popup will appear at this time if any tasks are unfinished.
+          </p>
+          <div class="reminder-form-actions">
+            <button class="reminder-clear-btn" *ngIf="reminderActive" (click)="clearReminder()">
+              Clear
+            </button>
+            <button class="reminder-save-btn" (click)="setReminder()" [disabled]="!reminderTime">
+              Set Reminder
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calendar toggle -->
+      <button class="calendar-btn" (click)="toggleCalendar()">
+        {{ showCalendar ? '▲ Hide Calendar' : '📅 Year View' }}
+      </button>
+
+      <!-- Create task -->
+      <button class="create-btn" (click)="openCreateForm()">
+        <span class="plus">+</span> Create Task
+      </button>
+    </div>
   </header>
 
+  <!-- ── Year Calendar ── -->
+  <div class="calendar-section" *ngIf="showCalendar">
+    <h2 class="calendar-title">Task Completion — {{ today | date:'yyyy' }}</h2>
+
+    <div class="calendar-container">
+      <div class="calendar-months">
+        <div
+          class="calendar-month-label"
+          *ngFor="let m of calendarMonths"
+          [style.left.px]="m.leftPx"
+        >{{ m.label }}</div>
+      </div>
+
+      <div class="calendar-body">
+        <div class="calendar-day-labels">
+          <span>S</span><span>M</span><span>T</span><span>W</span>
+          <span>T</span><span>F</span><span>S</span>
+        </div>
+
+        <div class="calendar-grid">
+          <ng-container *ngFor="let day of calendarData">
+            <div
+              *ngIf="day !== null"
+              [class]="calendarCellClass(day)"
+              [title]="calendarTooltip(day)"
+            ></div>
+            <div *ngIf="day === null" class="cal-cell cal-cell--pad"></div>
+          </ng-container>
+        </div>
+      </div>
+
+      <div class="calendar-legend">
+        <span class="legend-label">Less</span>
+        <div class="cal-cell cal-cell--none legend-cell"></div>
+        <div class="cal-cell cal-cell--low legend-cell"></div>
+        <div class="cal-cell cal-cell--mid-low legend-cell"></div>
+        <div class="cal-cell cal-cell--mid legend-cell"></div>
+        <div class="cal-cell cal-cell--high legend-cell"></div>
+        <span class="legend-label">More</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Task Grid ── -->
   <main class="task-grid" *ngIf="orderedTasks.length > 0; else empty">
     <div
       class="task-card"
@@ -49,10 +135,7 @@
       (dragover)="onDragOver($event, task.id)"
       (dragend)="onDragEnd()"
     >
-      <!-- Title & status -->
       <div class="task-card-top">
-
-        <!-- Status box is now a button -->
         <button
           class="task-status"
           [class.task-status--done]="task.completed"
@@ -61,18 +144,14 @@
         >
           <span *ngIf="task.completed">✓</span>
         </button>
-
         <div class="task-content">
           <h3 class="task-title" [class.task-title--done]="task.completed">{{ task.title }}</h3>
           <p class="task-description" *ngIf="task.description">{{ task.description }}</p>
           <p class="task-description task-description--empty" *ngIf="!task.description">No description</p>
         </div>
-
-        <!-- Drag handle indicator -->
         <div class="drag-handle" title="Drag to reorder">⠿</div>
       </div>
 
-      <!-- Date & interval metadata -->
       <div class="task-meta">
         <div class="meta-row">
           <div class="meta-item">
@@ -91,18 +170,15 @@
         </div>
       </div>
 
-      <!-- Action buttons -->
       <div class="task-actions">
         <button class="action-btn edit-btn" (click)="openEditForm(task)">Edit</button>
         <button class="action-btn delete-btn" (click)="requestDelete(task.id)">Delete</button>
       </div>
 
-      <!-- View Stats toggle -->
       <button class="stats-toggle-btn" (click)="toggleStats(task.id)">
         {{ isStatsOpen(task.id) ? 'Hide Stats ▲' : 'View Stats ▼' }}
       </button>
 
-      <!-- Stats panel -->
       <div class="stats-panel" *ngIf="isStatsOpen(task.id)">
         <div class="stats-row">
           <div class="stat-item">
@@ -120,12 +196,12 @@
         <div class="stats-formula-note" *ngIf="task.completionInterval === null">
           One-time task — {{ task.completed ? 'completed' : 'not yet completed' }}.
         </div>
-        <div class="stats-diagram-placeholder">
-          <canvas id="task-chart">{{ buildPCChart(task) }}</canvas>
+        <!-- Canvas sized explicitly so Chart.js doesn't render huge on first paint -->
+        <div class="chart-container">
+          <canvas [id]="'task-chart-' + task.id" width="240" height="200"></canvas>
         </div>
       </div>
 
-      <!-- Delete confirmation -->
       <div class="delete-confirm" *ngIf="deleteConfirmFor === task.id">
         <p class="confirm-message">Are you sure you want to delete this task?</p>
         <p class="confirm-sub">Press Yes to delete.</p>
@@ -134,7 +210,6 @@
           <button class="confirm-btn confirm-yes" (click)="confirmDelete(task.id)">Yes, Delete</button>
         </div>
       </div>
-
     </div>
   </main>
 
@@ -145,6 +220,18 @@
       <p class="empty-body">Hit "Create Task" to get started.</p>
     </div>
   </ng-template>
+
+</div>
+
+<!-- ── Reminder Popup ── -->
+<div class="reminder-overlay" *ngIf="showReminderPopup" (click)="dismissReminderPopup()"></div>
+<div class="reminder-popup" *ngIf="showReminderPopup">
+  <div class="reminder-popup-icon">🔔</div>
+  <h3 class="reminder-popup-title">Reminder</h3>
+  <p class="reminder-popup-body">
+    You have <strong>{{ pendingCount }} unfinished task{{ pendingCount !== 1 ? 's' : '' }}</strong> today.
+  </p>
+  <button class="reminder-popup-dismiss" (click)="dismissReminderPopup()">Got it</button>
 </div>
 
 <app-task-form
