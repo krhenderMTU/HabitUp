@@ -164,16 +164,25 @@ export class TaskListComponent implements OnInit, OnDestroy {
 
   buildPCChart(task: Task)
   {
-    
     const element = document.getElementById('task-chart') as HTMLCanvasElement;
 
+    // Grab the Days Completed and Total Daysa.
+    const days = todayJulian() - task.dateStarted;
+    var expected = 0;
+
+    if(task.completionInterval != null)
+    {
+      expected = Math.max(1, days / task.completionInterval);
+    }
+
+    // This Actually Draws the Chart.
     const chart = new Chart(element, {
       type: 'pie',
       data:{
-        labels: ['Days Completed'],
+        labels: ['Days Completed', 'Days Expected'],
         datasets: [{
-          data: [this.percentComplete(task)],
-          backgroundColor: ['rgb(87, 25, 214)'],
+          data: [task.timesCompleted, expected],
+          backgroundColor: ['rgb(233, 181, 9)', 'rgb(87, 25, 214)'],
           hoverOffset: 4
         }],
       }

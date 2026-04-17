@@ -121,7 +121,7 @@
           One-time task — {{ task.completed ? 'completed' : 'not yet completed' }}.
         </div>
         <div class="stats-diagram-placeholder">
-          <span class="placeholder-label">Chart coming soon</span>
+          <canvas id="task-chart">{{ buildPCChart(task) }}</canvas>
         </div>
       </div>
 
