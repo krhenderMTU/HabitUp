@@ -82,8 +82,24 @@ Use the **Edit** and **Delete** buttons on each card. Deletion requires a confir
 ### Stats
 Click **View Stats** on any task to see how many times it has been completed and your completion rate. Multiple stats panels can be open at the same time.
 
+### Year View (Contribution Calendar)
+Click **📅 Year View** in the header to show a GitHub-style heatmap of your task completion for the year so far. Each square represents one day, colored by how many of your active tasks were completed that day:
+
+| Color | Completion |
+|---|---|
+| Dark background | 0% |
+| Light green | 1–24% |
+| Medium-light green | 25–49% |
+| Green | 50–74% |
+| Dark green | 75–100% |
+
+Hover over any square to see the exact date and completion count. Today's square is outlined in gold. Note that each task stores only its most recent completion date, so the calendar is most accurate for today and recent days.
+
+### Reminders
+Click **🔔 Set Reminder** in the header to set a daily reminder time. If you have any incomplete tasks at that time, a popup will appear to prompt you to finish them. The reminder repeats every day at the set time until you clear it.
+
 ### Search
-Type in the **search bar** in the header to find a task by title. Select a result from the dropdown to jump to that task — it will move to the top of the list and briefly glow to show you where it is.
+Type in the **search bar** to find a task by title. Select a result from the dropdown to jump to that task — it will move to the top of the list and briefly glow to show you where it is.
 
 ### Reordering
 **Drag and drop** task cards to arrange them in any order you like.
